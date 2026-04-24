@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cortex 2026 — Simulador Financeiro Unificado</title>
+  <meta name="description" content="Motor financeiro profissional para pricing e simulação de custos do Cortex Eleitor. Lucro Presumido, comissões, margens e auditoria." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ════════════════════ HEADER (TOP BAR) ════════════════════ -->
+  <header id="app-header">
+    <div class="header-left">
+      <div class="header-brand">
+        <div class="brand-icon">
+          <svg width="38" height="38" viewBox="0 0 42 42" fill="none">
+            <rect x="3" y="3" width="36" height="36" rx="10" fill="url(#hg)" opacity="0.15"/>
+            <path d="M14 28L20 13h2l6 15h-2.5l-1.3-3.5h-6.4L16.5 28H14zm4.8-5.8h4.4L21 16l-2.2 6.2z" fill="url(#hg)"/>
+            <defs><linearGradient id="hg" x1="0" y1="0" x2="42" y2="42"><stop offset="0%" stop-color="#818cf8"/><stop offset="100%" stop-color="#6366f1"/></linearGradient></defs>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>CORTEX 2026</h1>
+          <span class="brand-sub">SIMULADOR FINANCEIRO UNIFICADO</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="hc-group">
+        <label for="h-estado">CENÁRIO / ESTADO</label>
+        <select id="h-estado"></select>
+      </div>
+      <div class="hc-group">
+        <label for="h-cargo">CARGO ALVO</label>
+        <select id="h-cargo"></select>
+      </div>
+      <div class="hc-robust">
+        <div class="robust-badge" id="robust-badge">
+          <span class="rb-dot"></span>
+          <span class="rb-label">Robusto</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ════════════════════ ALERTS ════════════════════ -->
+  <div id="alerts-bar" class="alerts-bar"></div>
+
+  <!-- ════════════════════ MAIN TWO-COLUMN ════════════════════ -->
+  <main id="app-main">
+
+    <!-- ▐ LEFT COLUMN — INPUTS ▐ -->
+    <div class="col-inputs" id="col-inputs">
+
+      <!-- ────── CARD 1: VENDA & ESCALA ────── -->
+      <div class="card" id="card-1">
+        <div class="card-head">
+          <span class="card-icon">💰</span>
+          <h3>1. A Venda & Escala</h3>
+          <span class="card-desc">Precificação bruta e projeção de portfólio.</span>
+        </div>
+        <div class="card-body">
+          <div class="input-grid ig-3">
+            <div class="field"><label for="c-estado">ESTADO</label><select id="c-estado"></select></div>
+            <div class="field"><label for="c-cargo">CARGO BASE</label><select id="c-cargo"></select></div>
+            <div class="field"><label for="c-months">MESES CONTRATO</label><input type="number" id="c-months" value="6" min="1" max="24" step="1"/></div>
+          </div>
+          <div class="input-grid ig-2" style="margin-top:14px">
+            <div class="field field-toggle">
+              <label for="c-robust">MODO ROBUSTO PREMIUM</label>
+              <div class="toggle-row">
+                <div class="toggle-wrap"><input type="checkbox" id="c-robust" checked/><span class="toggle-slider"></span></div>
+                <span class="toggle-hint" id="robust-hint">Margem mín. 50%, redundância máxima</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ────── CARD 2: CUSTOS ────── -->
+      <div class="card" id="card-2">
+        <div class="card-head">
+          <span class="card-icon">📊</span>
+          <h3>2. Custos Operacionais & CAPEX</h3>
+          <span class="card-desc">Infra, IA, Apps, Administrativo e Setup.</span>
+        </div>
+        <div class="card-body">
+          <div class="input-grid ig-2">
+            <div class="field"><label for="c-capex">CAPEX SETUP (R$)</label><input type="number" id="c-capex" value="200000" min="0" step="1000"/></div>
+            <div class="field"><label for="c-opex">OPEX MENSAL (R$)</label><input type="number" id="c-opex" value="35000" min="0" step="500"/></div>
+          </div>
+          <div class="input-grid ig-2">
+            <div class="field"><label for="c-infra">INFRA MENSAL (R$)</label><input type="number" id="c-infra" value="25000" min="0" step="500"/></div>
+            <div class="field"><label for="c-ia">IA / TOKENS MENSAL (R$)</label><input type="number" id="c-ia" value="30000" min="0" step="500"/></div>
+          </div>
+          <div class="input-grid ig-2">
+            <div class="field"><label for="c-apps">APPS MENSAL (R$)</label><input type="number" id="c-apps" value="3500" min="0" step="100"/></div>
+            <div class="field"><label for="c-admin">ADMINISTRATIVO MENSAL (R$)</label><input type="number" id="c-admin" value="7500" min="0" step="500"/></div>
+          </div>
+          <div class="input-grid ig-2">
+            <div class="field"><label for="c-contingency">CONTINGÊNCIA (%)</label><input type="number" id="c-contingency" value="10" min="0" max="100" step="1"/></div>
+            <div class="field field-toggle">
+              <label for="c-prolabore-on">PRÓ-LABORE</label>
+              <div class="toggle-row">
+                <div class="toggle-wrap"><input type="checkbox" id="c-prolabore-on"/><span class="toggle-slider"></span></div>
+                <input type="number" id="c-prolabore" value="0" min="0" step="500" class="inline-input" placeholder="R$/mês"/>
+              </div>
+              <span class="field-note" id="prolabore-hint"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ────── CARD 3: EQUIPE ────── -->
+      <div class="card" id="card-3">
+        <div class="card-head">
+          <span class="card-icon">👥</span>
+          <h3>3. Operação Humana Fixa (Modelo PJ)</h3>
+          <span class="card-desc">1º Contrato: Absorve o Setup. Escalabilidade pura nos demais.</span>
+        </div>
+        <div class="card-body">
+          <!-- SETUP -->
+          <div class="team-section">
+            <h4 class="team-label">▼ Equipe de Construção Inicial (Setup de 30 dias)</h4>
+            <div class="team-table-wrap">
+              <table class="team-table" id="team-setup-table">
+                <thead><tr><th></th><th>Função</th><th>Qtd</th><th>Custo/mês</th><th>Meses</th><th>Modelo</th><th>Total</th><th></th></tr></thead>
+                <tbody id="team-setup-body"></tbody>
+              </table>
+              <button class="btn-add" id="btn-add-setup">+ Adicionar linha</button>
+            </div>
+          </div>
+          <!-- OPERATION -->
+          <div class="team-section">
+            <h4 class="team-label">▼ Equipe NOC / Operação</h4>
+            <div class="team-table-wrap">
+              <table class="team-table" id="team-op-table">
+                <thead><tr><th></th><th>Função</th><th>Qtd</th><th>Custo/mês</th><th>Meses</th><th>Modelo</th><th>Total</th><th></th></tr></thead>
+                <tbody id="team-op-body"></tbody>
+              </table>
+              <button class="btn-add" id="btn-add-op">+ Adicionar linha</button>
+            </div>
+          </div>
+          <!-- ENCARGOS & 24/7 -->
+          <div class="input-grid ig-2" style="margin-top:14px;">
+            <div class="field"><label for="c-clt-burden">ENCARGOS CLT (%)</label><input type="number" id="c-clt-burden" value="80" min="0" max="200" step="5"/></div>
+            <div class="field"><label for="c-pj-burden">ENCARGOS PJ (%)</label><input type="number" id="c-pj-burden" value="0" min="0" max="100" step="1"/></div>
+          </div>
+          <div class="input-grid ig-2" style="margin-top:8px;">
+            <div class="field field-toggle">
+              <label for="c-247">COBERTURA 24/7 REAL</label>
+              <div class="toggle-row">
+                <div class="toggle-wrap"><input type="checkbox" id="c-247" checked/><span class="toggle-slider"></span></div>
+                <input type="number" id="c-247-people" value="5" min="0" max="50" step="1" class="inline-input" style="width:70px" />
+                <span class="toggle-hint">pessoas</span>
+              </div>
+            </div>
+          </div>
+          <div class="coverage-box" id="coverage-box"></div>
+        </div>
+      </div>
+
+      <!-- ────── CARD 4: TRIBUTOS ────── -->
+      <div class="card" id="card-4">
+        <div class="card-head">
+          <span class="card-icon">🏛</span>
+          <h3>4. Impostos (Lucro Presumido)</h3>
+          <span class="card-desc">Regime tributário completo com IRPJ Adicional.</span>
+        </div>
+        <div class="card-body">
+          <div class="input-grid ig-3">
+            <div class="field"><label for="c-pis">PIS (%)</label><input type="number" id="c-pis" value="0.65" min="0" max="10" step="0.01"/></div>
+            <div class="field"><label for="c-cofins">COFINS (%)</label><input type="number" id="c-cofins" value="3" min="0" max="10" step="0.01"/></div>
+            <div class="field"><label for="c-iss">ISS (%)</label><input type="number" id="c-iss" value="5" min="0" max="10" step="0.01"/></div>
+          </div>
+          <div class="input-grid ig-2">
+            <div class="field"><label for="c-irpj-presumed">BASE PRESUMIDA IRPJ (%)</label><input type="number" id="c-irpj-presumed" value="32" min="0" max="100" step="1"/></div>
+            <div class="field"><label for="c-irpj-rate">ALÍQUOTA IRPJ (%)</label><input type="number" id="c-irpj-rate" value="15" min="0" max="50" step="0.5"/></div>
+          </div>
+          <div class="input-grid ig-2">
+            <div class="field"><label for="c-csll-presumed">BASE PRESUMIDA CSLL (%)</label><input type="number" id="c-csll-presumed" value="32" min="0" max="100" step="1"/></div>
+            <div class="field"><label for="c-csll-rate">ALÍQUOTA CSLL (%)</label><input type="number" id="c-csll-rate" value="9" min="0" max="50" step="0.5"/></div>
+          </div>
+          <div class="input-grid ig-2">
+            <div class="field"><label for="c-irpj-add-rate">IRPJ ADICIONAL (%)</label><input type="number" id="c-irpj-add-rate" value="10" min="0" max="50" step="0.5"/></div>
+            <div class="field"><label for="c-irpj-add-threshold">LIMITE MENSAL IRPJ ADIC. (R$)</label><input type="number" id="c-irpj-add-threshold" value="20000" min="0" step="1000"/></div>
+          </div>
+          <div class="input-grid ig-2">
+            <div class="field"><label for="c-other-with">OUTRAS RETENÇÕES (%)</label><input type="number" id="c-other-with" value="0" min="0" max="20" step="0.1"/></div>
+          </div>
+          <!-- Tax breakdown display -->
+          <div class="tax-result-display" id="tax-breakdown-display"></div>
+        </div>
+      </div>
+
+      <!-- ────── CARD 5: COMISSÕES ────── -->
+      <div class="card" id="card-5">
+        <div class="card-head">
+          <span class="card-icon">🤝</span>
+          <h3>5. Comissões Comerciais</h3>
+          <span class="card-desc">Estrutura de vendas e intermediação.</span>
+        </div>
+        <div class="card-body">
+          <div class="input-grid ig-3">
+            <div class="field"><label for="c-comm-sales">DIRETOR COMERCIAL (%)</label><input type="number" id="c-comm-sales" value="10" min="0" max="50" step="0.5"/></div>
+            <div class="field"><label for="c-comm-biz">INTRODUTOR DE NEGÓCIO (%)</label><input type="number" id="c-comm-biz" value="5" min="0" max="50" step="0.5"/></div>
+            <div class="field"><label for="c-comm-other">OUTRAS COMISSÕES (%)</label><input type="number" id="c-comm-other" value="0" min="0" max="50" step="0.5"/></div>
+          </div>
+          <div id="comm-summary" class="summary-block"></div>
+        </div>
+      </div>
+
+      <!-- ────── CARD 6: MARGENS ────── -->
+      <div class="card" id="card-6">
+        <div class="card-head">
+          <span class="card-icon">📈</span>
+          <h3>6. Margens & Estratégia de Pricing</h3>
+          <span class="card-desc">Markup e pisos mínimos por cargo.</span>
+        </div>
+        <div class="card-body">
+          <div class="input-grid ig-2">
+            <div class="field"><label for="c-m-op">LUCRO OPERACIONAL (%)</label><input type="number" id="c-m-op" value="20" min="0" max="100" step="0.5"/></div>
+            <div class="field"><label for="c-m-rnd">P&D (%)</label><input type="number" id="c-m-rnd" value="8" min="0" max="100" step="0.5"/></div>
+          </div>
+          <div class="input-grid ig-2">
+            <div class="field"><label for="c-m-risk">RESERVA DE RISCO (%)</label><input type="number" id="c-m-risk" value="8" min="0" max="100" step="0.5"/></div>
+            <div class="field"><label for="c-m-premium">PREMIUM (%)</label><input type="number" id="c-m-premium" value="10" min="0" max="100" step="0.5"/></div>
+          </div>
+          <div class="input-grid ig-2">
+            <div class="field field-toggle">
+              <label for="c-m-additive">MODO DO MARKUP</label>
+              <div class="toggle-row">
+                <div class="toggle-wrap"><input type="checkbox" id="c-m-additive" checked/><span class="toggle-slider"></span></div>
+                <span class="toggle-hint" id="margin-mode-hint">Aditivo ativo (recomendado)</span>
+              </div>
+            </div>
+          </div>
+          <div id="margin-summary" class="summary-block"></div>
+          <!-- Pisos -->
+          <h4 class="sub-section-label" style="margin-top:18px;">Pisos por Cargo</h4>
+          <div class="input-grid ig-2">
+            <div class="field"><label for="c-floor-pres">PISO PRESIDENTE (R$)</label><input type="number" id="c-floor-pres" value="5300000" min="0" step="100000"/></div>
+            <div class="field"><label for="c-floor-gov">PISO GOVERNADOR (% DO PREÇO)</label><input type="number" id="c-floor-gov" value="89" min="0" max="100" step="1"/></div>
+          </div>
+          <div class="input-grid ig-3">
+            <div class="field"><label for="c-floor-sen">PISO SENADOR (%)</label><input type="number" id="c-floor-sen" value="90" min="0" max="100" step="1"/></div>
+            <div class="field"><label for="c-floor-depf">PISO DEP. FEDERAL (%)</label><input type="number" id="c-floor-depf" value="90" min="0" max="100" step="1"/></div>
+            <div class="field"><label for="c-floor-depe">PISO DEP. ESTADUAL (%)</label><input type="number" id="c-floor-depe" value="92" min="0" max="100" step="1"/></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ────── CARD 7: AVANÇADO (collapsible) ────── -->
+      <div class="card" id="card-7">
+        <div class="card-head clickable" id="btn-toggle-adv">
+          <span class="card-icon">⚙</span>
+          <h3>7. Parâmetros Avançados</h3>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="collapsible collapsed" id="adv-body">
+          <div class="card-body">
+            <h4 class="sub-section-label">Shares Multi-Tenant (Legislativo)</h4>
+            <div class="input-grid ig-3">
+              <div class="field"><label for="c-sh-setup">SETUP/CAPEX (%)</label><input type="number" id="c-sh-setup" value="8" min="0" max="100" step="1"/></div>
+              <div class="field"><label for="c-sh-op">OPERAÇÃO (%)</label><input type="number" id="c-sh-op" value="12" min="0" max="100" step="1"/></div>
+              <div class="field"><label for="c-sh-opex">OPEX (%)</label><input type="number" id="c-sh-opex" value="10" min="0" max="100" step="1"/></div>
+            </div>
+            <div class="input-grid ig-4">
+              <div class="field"><label for="c-sh-infra">INFRA (%)</label><input type="number" id="c-sh-infra" value="10" min="0" max="100" step="1"/></div>
+              <div class="field"><label for="c-sh-token">IA/TOKENS (%)</label><input type="number" id="c-sh-token" value="15" min="0" max="100" step="1"/></div>
+              <div class="field"><label for="c-sh-apps">APPS (%)</label><input type="number" id="c-sh-apps" value="5" min="0" max="100" step="1"/></div>
+              <div class="field"><label for="c-sh-admin">ADMIN (%)</label><input type="number" id="c-sh-admin" value="5" min="0" max="100" step="1"/></div>
+            </div>
+            <h4 class="sub-section-label" style="margin-top:14px;">Reservas Modo Robusto</h4>
+            <div class="input-grid ig-3">
+              <div class="field"><label for="c-r-token">RESERVA TOKENS (%)</label><input type="number" id="c-r-token" value="30" min="0" max="100" step="5"/></div>
+              <div class="field"><label for="c-r-infra">REDUNDÂNCIA INFRA (%)</label><input type="number" id="c-r-infra" value="25" min="0" max="100" step="5"/></div>
+              <div class="field"><label for="c-r-support">RESERVA SUPORTE (%)</label><input type="number" id="c-r-support" value="20" min="0" max="100" step="5"/></div>
+            </div>
+            <div class="input-grid ig-3">
+              <div class="field"><label for="c-r-leg-support">LEG. SUPORTE (%)</label><input type="number" id="c-r-leg-support" value="15" min="0" max="100" step="5"/></div>
+              <div class="field"><label for="c-r-leg-infra">LEG. INFRA (%)</label><input type="number" id="c-r-leg-infra" value="15" min="0" max="100" step="5"/></div>
+              <div class="field"><label for="c-r-leg-token">LEG. TOKENS (%)</label><input type="number" id="c-r-leg-token" value="20" min="0" max="100" step="5"/></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ────── PRICING TABLE ────── -->
+      <div class="card" id="card-table">
+        <div class="card-head">
+          <span class="card-icon">📋</span>
+          <h3>Tabela de Pricing — <span id="table-state-label">São Paulo</span></h3>
+          <span class="badge-live">LIVE</span>
+        </div>
+        <div class="card-body no-pad">
+          <div class="table-wrap">
+            <table id="main-table">
+              <thead>
+                <tr>
+                  <th>Cargo</th><th>Preço Final</th><th>Piso</th><th>Custo Base</th>
+                  <th>Tributos</th><th>Comissões</th><th>Lucro</th><th>Margem</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="main-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /col-inputs -->
+
+    <!-- ▐ RIGHT COLUMN — DRE CONSOLIDADO ▐ -->
+    <div class="col-dre" id="col-dre">
+      <div class="dre-panel" id="dre-panel">
+
+        <div class="dre-badge-row">
+          <span class="dre-badge">DRE CONSOLIDADO (<span id="dre-months">6</span> MESES)</span>
+        </div>
+        <h2 class="dre-title">Diagnóstico de Viabilidade</h2>
+
+        <!-- DRE Lines filled by JS -->
+        <div id="dre-lines"></div>
+
+        <!-- LUCRO + MARGEM BADGE -->
+        <div class="dre-lucro-block" id="dre-lucro-block"></div>
+
+        <!-- STATUS -->
+        <div id="dre-status-box"></div>
+
+        <!-- RADAR SECTION -->
+        <div id="dre-radar"></div>
+
+        <!-- MINI DONUT -->
+        <div class="dre-donut-section">
+          <h4 class="dre-section-label">Composição — <span id="chart-label">Presidente</span></h4>
+          <div class="dre-chart-wrap">
+            <canvas id="donut" width="240" height="240"></canvas>
+            <div class="chart-center" id="chart-center"></div>
+          </div>
+          <div class="chart-legend" id="chart-legend"></div>
+        </div>
+
+        <!-- COST BREAKDOWN -->
+        <div class="dre-cost-detail" id="cost-summary"></div>
+
+      </div>
+    </div><!-- /col-dre -->
+
+  </main>
+
+  <!-- ════════════════════ FULL-WIDTH SECTIONS ════════════════════ -->
+  <div class="below-sections">
+
+    <!-- ── MATRIX ── -->
+    <div class="card card-fw" id="panel-matrix">
+      <div class="card-head clickable" id="btn-toggle-matrix">
+        <span class="card-icon">🗺</span>
+        <h3>Matriz Estado × Cargo</h3>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="collapsible collapsed" id="matrix-body">
+        <div class="card-body no-pad">
+          <div class="table-wrap">
+            <table class="matrix-table" id="matrix-table">
+              <thead id="matrix-thead"></thead>
+              <tbody id="matrix-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AUDIT ── -->
+    <div class="card card-fw" id="panel-audit">
+      <div class="card-head clickable" id="btn-toggle-audit">
+        <span class="card-icon">🔍</span>
+        <h3>Auditoria Financeira</h3>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="collapsible collapsed" id="audit-body">
+        <div class="card-body">
+          <div class="audit-grid" id="audit-grid"></div>
+          <div class="sanity-section">
+            <h4>Sanity Checks (assert)</h4>
+            <div class="sanity-grid" id="sanity-grid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════ FOOTER ════════════════════ -->
+  <footer id="app-footer">
+    <div class="footer-actions">
+      <button class="btn-footer" id="btn-reset">↻ Reset Baseline</button>
+      <button class="btn-footer" id="btn-export">↓ Exportar JSON</button>
+      <label class="btn-footer btn-file"><input type="file" id="btn-import" accept=".json" hidden/>↑ Importar JSON</label>
+    </div>
+    <div class="footer-info">
+      <span>CORTEX 2026 — Simulador Financeiro v2.0</span>
+      <span class="sep">·</span>
+      <span>100% frontend — zero chamadas externas</span>
+    </div>
+  </footer>
+
+  <script src="engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
